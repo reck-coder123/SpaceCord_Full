@@ -1,0 +1,26 @@
+body{
+    background-image: url('../jpg/pic5.png');
+    background-size: cover ;
+    background-repeat: no-repeat;
+    background-position: center ;
+}
+.container div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.navside{
+    width: 782px;
+}
+.navside div{
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+
+.nav ul{
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
