@@ -1,6 +1,19 @@
 import { useState } from "react";
 import styles from "./styles.module.css";
 import axios from "axios";
+import bg from "../jpg/Pointers2.png"
+import Container from 'react-bootstrap/Container';
+// import Form from 'react-bootstrap/Form';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import logo from "../jpg/Bcom.logo1.jpg";
+import profile_logo from '../Main/Icon 4 (Users).png'
+// import { TypeAnimation } from 'react-type-animation';
+import Form from 'react-bootstrap/Form';
+import Input from '@mui/joy/Input';
+import Textarea from '@mui/joy/Textarea';
+import Button from '@mui/joy/Button';
+import Vertical from "components/flexbetween/horizontal";
 
 const Inscribe=()=>{
 
@@ -45,26 +58,95 @@ const Inscribe=()=>{
         }
     }
     return(
-        <>
-        <div className="container">
-        {error && <div className={styles.error_msg}>{error}</div>}
-        {msg && <div className={styles.success_msg}>{msg}</div>}   
-        <form method="post" onSubmit={handleSubmit}>
-            <label htmlFor="title">Title</label>
-            <input type="text"  name="title" onChange={handleChange} value={data.title} placeholder="Enter title" required />
+        <div className="full" style={{
+            backgroundImage:`url(${bg})`,backgroundAttachment:"fixed",minHeight:"100vh", height:"100%", width:"100%", backgroundSize:"cover", backgroundRepeat:"no-repeat", backgroundPosition:"center"
+          }}>
+        <Navbar style={{position:"sticky" ,top:"0",background:"transparent",zIndex:"999"}} expand="lg" data-bs-theme="dark">
+      <Container fluid>
+        <Navbar.Brand href="/"><img src={logo} alt="logo" style={{width:"42px",height:"42px"}} />Inscribe</Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbarScroll" />
+        <Navbar.Collapse id="navbarScroll" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <Nav
+            className="me-auto my-2 my-lg-0"
+            style={{ maxHeight: '100px' }}
+            navbarScroll
+          >
+            <Nav.Link href="/">Home</Nav.Link>
+            <Nav.Link href="/inscribe">inscribe</Nav.Link>
+            <Nav.Link href="/">cluster</Nav.Link>
+            <Nav.Link href="/feeds">Feeds</Nav.Link>
+          </Nav>
+          
+{/* <Vertical />
+<Vertical />
+<Vertical />
+<Vertical />
+<Horizontal1 /> */}
+          
+              
+            
+          <Navbar.Text>
+          <a href={"/profile/"+localStorage.getItem("Id")}><img src={profile_logo} alt="profile" /></a>
 
-            <label htmlFor="Content">Title</label>
-            <input type="text" name="content" onChange={handleChange} value={data.content} placeholder="write your content" required />
+        </Navbar.Text>
+          
+          
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+
+
+    
+
+        <div className={styles.container}>  
+        <form method="post" onSubmit={handleSubmit}>
+        
+            {/* <input type="text"  name="title" onChange={handleChange} value={data.title} placeholder="Enter title" required /> */}
+            {/* <Form.Control type="text" name="title" onChange={handleChange} value={data.title} placeholder="Enter title" required /> */}
+            <div className="title">
+            <Input
+  color="neutral"
+  placeholder="Title"
+  variant="outlined"
+  type="text" name="title" onChange={handleChange} value={data.title}
+  style={{background:"rgba(0, 0, 0, 0.6)",color:"white"}}
+  required
+/>
+            </div>
+            
+
             <div className="col-12">
-                  <label className="form-label" >Add Your Image</label>
-                  <input type="file" className="form-control" id="customFile" name="image" onChange={handleChange} />
+                  
+                  {/* <input type="file" className="form-control" id="customFile" name="image" onChange={handleChange} /> */}
+                  <Form.Control type="file" name="image" style={{background:"rgba(0, 0, 0, 0.6)",color:"white"}} onChange={handleChange}/>
                 </div>
 
-            <button type="submit" className="btn btn-dark" onSubmit={handleSubmit}>inscribe</button>
+            
+            {/* <textarea type="text" name="content" onChange={handleChange} value={data.content} placeholder="write your content" required /> */}
+            <div className="content">
+            <Textarea
+  color="neutral"
+  minRows={2}
+  placeholder="Inscribe it..."
+  size="md"
+  name="content" onChange={handleChange} value={data.content}
+  style={{background:"rgba(0, 0, 0, 0.6)",color:"white",height:"18rem"}}
+  required
+/>
+            </div>
+            
+            
+
+            {/* <button type="submit" className="btn btn-dark" onSubmit={handleSubmit}>inscribe</button> */}
+            <Button type="submit" style={{width:"5rem",marginTop:"6px", color:"white"}} color="info" onSubmit={handleSubmit} >Inscribe</Button>
         </form>
+            </div>
+            <Vertical />
+            <Vertical />
+            <Vertical />
         </div>
         
-        </>
+        
     )
 }
 export default Inscribe;

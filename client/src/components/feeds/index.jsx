@@ -2,15 +2,62 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./styles.module.css";
 import logo from "../jpg/Bcom.logo1.jpg";
+import bg from "../jpg/pic5.png";
+import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import profile_logo from '../Main/Icon 4 (Users).png'
 import Horizontal from "components/flexbetween/horizontal";
 import Horizontal1 from "components/flexbetween/horizontal1";
+import Accordion from 'react-bootstrap/Accordion';
+import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+// import Button from 'react-bootstrap/Button';
+import Spinner from 'react-bootstrap/Spinner';
+import Avatar from '@mui/material/Avatar';
+import { useNavigate } from "react-router-dom";
+import Alert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Button from '@mui/material/Button';
+
+
 
 
 const Feeds = () => {
   const [feedsData, setFeedsData] = useState([]);
+  const [userData,setUserData]=useState([]);
   const [error, setError] = useState("");
   // const [imageURL, setImageURL] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const [scrolled, SetScrolled]= useState(false);
+  const [show, setShow] = useState(false);
+  const [loading,setLoading] =useState(false);
+  const navigate = useNavigate();
+
+
+
+      useEffect(()=>{
+        const onScroll= ()=>{
+            if(window.scrollY>50){
+                SetScrolled(true)
+            }
+            else{
+                SetScrolled(false);
+            }
+        }
+
+        window.addEventListener('scroll',onScroll);
+        return ()=> window.removeEventListener;
+    }, [])
+
+  const isLocalstorageempty = () => {
+    if (localStorage.getItem('token') === null) {
+      return true;
+    }
+    return false;
+  };
 
   const getFeeds = async () => {
     try {
@@ -27,12 +74,7 @@ const Feeds = () => {
       }
       const data = await response.json();
       setFeedsData(data);
-      data.forEach((item) => {
-        console.log("Item:", item);
-        console.log("Image:", item.image);
-        console.log("UserName:", item.image.data.data);
-        // Access other fields as needed
-      });
+      
       
       
     } catch (error) {
@@ -40,8 +82,31 @@ const Feeds = () => {
     }
   };
 
+  
+
+  const getusers= async()=>{
+    try {
+      const url= `http://localhost:8080/api/profile/fullData`;
+      const response= await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch user details");
+      }
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   useEffect(() => {
     getFeeds();
+    getusers();
   }, []);
 
   const filterPosts = () => {
@@ -54,7 +119,15 @@ const Feeds = () => {
     }
   };
 
-  const patchLike = async (_id, postId) => {
+  const patchLike = async (_id) => {
+    const postId = localStorage.getItem("Id"); // Use "postId" instead of "Id"
+
+    if(postId===null){
+      setShow(true);
+      setError("login to like post!!")
+      return;
+    }
+  
     const response = await fetch(
       `http://localhost:8080/api/posts/${_id}/upcord`,
       {
@@ -62,9 +135,10 @@ const Feeds = () => {
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify({ postId: postId }),
+        body: JSON.stringify({ postId }), // Use "postId" as the key
       }
     );
+  
     const updatedPost = await response.json();
     setFeedsData((prevData) =>
       prevData.map((feed) =>
@@ -72,8 +146,17 @@ const Feeds = () => {
       )
     );
   };
+  
 
-  const patchdisLike = async (_id, postId) => {
+  const patchdisLike = async (_id) => {
+    const postId = localStorage.getItem("Id");
+
+    if(postId===null){
+      setShow(true);
+      setError("login to dislike post!!")
+      return;
+    }
+
     const response = await fetch(
       `http://localhost:8080/api/posts/${_id}/downcord`,
       {
@@ -81,7 +164,7 @@ const Feeds = () => {
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify({ postId: postId }),
+        body: JSON.stringify({ postId}),
       }
     );
     const updatedPost = await response.json();
@@ -95,179 +178,244 @@ const Feeds = () => {
   // Assuming you have a separate state for the new comment
   const [newComment, setNewComment] = useState("");
 
-  // Update the handleChange function to handle changes to the new comment input
-  const handleChange = ({ currentTarget: input }) => {
-    setNewComment(input.value);
-  };
 
-  // Update the post_comment function to send the new comment to the backend
-  const post_comment = async (_id, event) => {
-    try {
-      event.preventDefault();
-      const url = `http://localhost:8080/api/posts/${_id}/comment`;
+// Update the handleChange function to handle changes to the new comment input
+const handleChange = ({ currentTarget: input }) => {
+  setNewComment(input.value);
+};
 
-      const commentData = {
-        comment: newComment,
-      };
+// Update the post_comment function to send the new comment to the backend
+const post_comment = async (_id, event) => {
+  try {
+    event.preventDefault();
 
-      const { data: res } = await axios.post(url, commentData);
-      window.location = "/feeds";
-      const msg = res.message;
-      console.log(msg);
-    } catch (error) {
-      if (
-        error.response &&
-        error.response.status >= 400 &&
-        error.response.status <= 500
-      ) {
-        setError(error.response.data.message);
-      }
+    // Check if the new comment is empty
+    if (newComment.trim() === "") {
+      setShow(true);
+      setError("comment can't be empty!!");
+      return; // Stop execution if comment is empty
     }
-  };
+
+    setLoading(true);
+
+    const url = `http://localhost:8080/api/posts/${_id}/comment`;
+
+    const commentData = {
+      senderid: localStorage.getItem("Id"),
+      comment: newComment,
+    };
+
+    const { data: res } = await axios.post(url, commentData);
+
+    setLoading(false);
+    setNewComment("");
+    // window.location = "/feeds";
+    const msg = res.message;
+    console.log(msg);
+    // $("#comment-section").load(window.location.href + " #comment-section", function () {
+    //   setLoading(false); // Set loading state to false once the comment section has finished loading
+    // });
+
+  } catch (error) {
+    if (
+      error.response &&
+      error.response.status >= 400 &&
+      error.response.status <= 500
+    ) {
+      setError(error.response.data.message);
+    }
+  }
+};
+
+  
 
   return (
-    <>
-      <nav className="navbar navbar-expand-lg" data-bs-theme="dark">
-        <div className={styles.container + " container-fluid"}>
-          <div className="logo">
-            <a className="navbar-brand" href="/">
-              <img src={logo} alt="logo" width="44px" height="63px" />
-              feeds
-            </a>
-          </div>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
+    <div className="feedsfull" style={{
+      backgroundImage:`url(${bg})`,backgroundAttachment:"fixed",minHeight:"100vh", width:"100%", backgroundSize:"cover", backgroundRepeat:"no-repeat", backgroundPosition:"center"
+    }}>
+      {show && (
 
-          <div
-            className={styles.navside + " collapse navbar-collapse"}
-            id="navbarSupportedContent"
+        <Alert severity="error" 
+        style={{position:"sticky" ,top:"0",height:"4rem",zIndex:999999}}
+        variant="filled"
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setShow(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+          sx={{ mb: 2 }}
+        >
+          {error}
+        </Alert>
+
+        
+      )}
+
+
+
+
+      <Navbar style={{position:"sticky" ,top:"0"}} className={scrolled ? styles.scrolled: ""} expand="lg" data-bs-theme="dark">
+      <Container fluid>
+        <Navbar.Brand href="/"><img src={logo} alt="logo" style={{width:"42px",height:"42px"}} />feeds</Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbarScroll" />
+        <Navbar.Collapse id="navbarScroll" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <Nav
+            className="me-auto my-2 my-lg-0"
+            style={{ maxHeight: '100px' }}
+            navbarScroll
           >
-            <Horizontal />
-            <div className={styles.nav}>
-              <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                <li className="nav-item">
-                  <a className="nav-link active" aria-current="page" href="/">
-                    Home
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="/">
-                    Scoop
-                  </a>
-                </li>
-                <li className="nav-item ">
-                  <a
-                    className="nav-link"
-                    href="/inscribe"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    Inscribe
-                  </a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="/">
-                    logout
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div className="form">
-              <form className="d-flex" role="search">
-                <input
-                  className="form-control me-2"
-                  type="search"
-                  placeholder="what's on your mind today?"
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  value={searchInput}
-                  aria-label="Search"
-                />
-                {/* <!-- <button className="btn btn-outline-success" type="submit">Search</button> --> */}
-              </form>
-            </div>
-            <Horizontal />
-          </div>
-          <div
-            className="login"
-            style={{ display: "flex", justifyContent: "space-between" }}
-          >
-            <p>Already have an account?</p>
-            <a href="#">login here</a>
-          </div>
-          <Horizontal1 />
-        </div>
-      </nav>
-      {error && <div className="error">{error}</div>}
-      {Array.isArray(feedsData) ? (
-  filterPosts().map((feed) => {
-    const filenameBuffer = feed.image.data.data;
-    const uint8Array = new Uint8Array(filenameBuffer);
-    const filename = String.fromCharCode.apply(null, uint8Array);
-    const imageURL = `http://localhost:8080/api/posts/image/${filename}`;
+            <Nav.Link href="/">Home</Nav.Link>
+            <Nav.Link href="/inscribe">inscribe</Nav.Link>
+            <Nav.Link href="/">cluster</Nav.Link>
+          </Nav>
+          <div className={styles.searchcontainer + " searchcontainer"}>
+  <Form className="d-flex">
+    <Form.Control
+      type="search"
+      placeholder="what's on your mind today?.."
+      onChange={(e) => setSearchInput(e.target.value)}
+      value={searchInput}
+      className="me-2"
+      aria-label="Search"
+    />
+  </Form>
+  
+</div>
+<Horizontal />
+<Horizontal />
+<Horizontal />
+<Horizontal />
+<Horizontal1 />
+          {isLocalstorageempty() ? (
+              
+            
+          <Navbar.Text>
+          
+          <a href="/login"><span style={{color:"blue"}}><Button variant="contained" color="success">
+  login
+</Button></span></a>
+        </Navbar.Text>
+          ):(
+            <Navbar.Text>
+           <a href={"/profile/"+localStorage.getItem("Id")}><img src={profile_logo} alt="profile" /></a>
+          </Navbar.Text>
+          )}
+          
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+      
+    {Array.isArray(feedsData) ? (
+  [...filterPosts()].reverse().map((feed) => {
+    const user = userData.find((user) => user._id === feed.postId);
+
+    const fileUKnameBuffer = feed.UserImage.data.data;
+    const UKuint8Array = new Uint8Array(fileUKnameBuffer);
+    const fileUKname = String.fromCharCode.apply(null, UKuint8Array);
+    const iUKmageURL = `http://localhost:8080/api/profile/image/${fileUKname}`;
+
+    let imageURL = null;
+    if (feed.image) {
+      const filenameBuffer = feed.image.data.data;
+      const uint8Array = new Uint8Array(filenameBuffer);
+      const filename = String.fromCharCode.apply(null, uint8Array);
+      imageURL = `http://localhost:8080/api/posts/image/${filename}`;
+    }
 
     return (
-      <div key={feed._id}>
-        <h3>Title: {feed.title}</h3>
-        <h4>Content: {feed.content}</h4>
-        <img src={imageURL} alt="Profile" />
-        <button onClick={() => patchLike(feed._id, feed.postId)}>
-          Like
-        </button>
-        <button onClick={() => patchdisLike(feed._id, feed.postId)}>
-          Dislike
-        </button>
-
-        <div className="comment">
-          <div className="col-12">
-            <label className="form-label">Post comment:</label>
-            <input
-              type="text"
-              name="newComment"
-              className="form-control"
-              id="inputAddress"
-              placeholder="Comment"
-              onChange={handleChange}
-              style={{ background: "rgba(0,0,0,.6)", color: "white" }}
-              required
-            />
-          </div>
-          <div className="col-12">
-            <button
-              type="submit"
-              className="btn btn-dark"
-              onClick={(event) => post_comment(feed._id, event)}
-            >
-              Post
-            </button>
-          </div>
-          <div className="viewcomment">
-            {feed.comments.map((c) => (
-              <div key={c._id}>
-                <h4>{c.senderName}</h4>
-                <h5>{c.comment}</h5>
-              </div>
-            ))}
-          </div>
+      <div className={styles.feeds} key={feed._id}>
+        <div className="prsnal" style={{display:"flex", gap:"10px"}}>
+          <Avatar onClick={() => navigate(`/profile/${feed.postId}`)} alt={feed.UserName} src={iUKmageURL} /> <h4>{feed.UserName}</h4>
         </div>
+        {user && <p>{user.college} {user.city}</p>}
+        
+        <hr />
+        <p>{feed.title}</p>
+        <div className={styles.content}>
+          <p>{feed.content}</p>
+          {imageURL && <img className={styles.image} src={imageURL} alt="Profile" />}
+        </div>
+        <div>
+          <button className={styles.button} style={{ marginRight: "10px" }} onClick={() => patchLike(feed._id)}>
+            <ArrowCircleUpIcon /> upcord {Object.keys(feed.upcord).length}
+          </button>
+          <button className={styles.button} onClick={() => patchdisLike(feed._id)}>
+            <ArrowCircleDownIcon /> downcord {Object.keys(feed.downcord).length}
+          </button>
+        </div>
+
+        <Accordion data-bs-theme="dark">
+          <Accordion.Item eventKey="0">
+            <Accordion.Header>Comments</Accordion.Header>
+            <Accordion.Body>
+              <div className="comment" id="comment-section">
+                <div className="col-12">
+                  <label className="form-label">Post comment:</label>
+                  <input
+                    type="text"
+                    name="newComment"
+                    className="form-control"
+                    id="inputAddress"
+                    placeholder="Comment"
+                    onChange={handleChange}
+                    style={{ background: "rgba(0,0,0,.6)", color: "white" }}
+                    value={newComment}
+                    required
+                  />
+                </div>
+                <div className="col-12">
+                  {/* <button
+                    type="submit"
+                    className="btn btn-dark"
+                    onClick={(event) => post_comment(feed._id, event)}
+                  >
+                    Post
+                  </button> */}
+                  <Button type="submit" style={{ margin: "10px 0 10px 0" }} onClick={(event) => post_comment(feed._id, event)} variant="contained" color="success" disabled={loading}>
+                  {loading ? (
+                <Spinner
+                  animation="border"
+                  role="status"
+                  size="sm"
+                  className="me-2"
+                >
+                  <span className="visually-hidden">Loading...</span>
+                </Spinner>
+              ) : (
+                "Post"
+              )}</Button>
+                </div>
+                <div className="viewcomment">
+                  {[...feed.comments].reverse().map((c) => (
+                    <div key={c._id}>
+                      <p>{c.senderName}</p>
+                      <p>{c.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Accordion.Body>
+          </Accordion.Item>
+        </Accordion>
+
       </div>
     );
   })
 ) : (
-  <div className="loading">Loading...</div>
+    <div className="loading">Loading...</div>
 )}
 
-    </>
+
+    </div>
   );
 };
+
 
 export default Feeds;

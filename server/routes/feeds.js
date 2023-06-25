@@ -20,58 +20,60 @@ router.get('/image/:filename', (req, res) => {
     
     const filename = req.params.filename;
     const imagePath = path.join(__dirname, '../public/assets', filename);
-    console.log(imagePath);
     res.sendFile(imagePath);
   });
 
-router.patch("/:id/upcord", async (req, res) => {
+  router.patch("/:id/upcord", async (req, res) => {
     try {
-        const { id } = req.params;
-        const userID = localStorage.getItem("id");
-        const post = await Inscribe.findById(id);
-        const isupcorded = post.upcord.get(userID);
-        const isdowncorded = post.downcord.get(userID);
-
-        if (isupcorded) {
-            post.upcord.delete(userID);
-        } else if (isdowncorded) {
-            post.downcord.delete(userID);
-            post.upcord.set(userID, true);
-        } else {
-            post.upcord.set(userID, true);
-        }
-
-        const updatedPost = await Inscribe.findByIdAndUpdate(
-            id,
-            { upcord: post.upcord, downcord: post.downcord },
-            { new: true }
-        );
-        res.status(200).json(updatedPost);
+      const { id } = req.params;
+      const { postId } = req.body; // Use "postId" instead of "postId"
+  
+      const post = await Inscribe.findById(id);
+      const isupcorded = post.upcord.get(postId); // Use "postId" as the key
+      const isdowncorded = post.downcord.get(postId); // Use "postId" as the key
+  
+      if (isupcorded) {
+        post.upcord.delete(postId); // Use "postId" as the key
+      } else if (isdowncorded) {
+        post.downcord.delete(postId); // Use "postId" as the key
+        post.upcord.set(postId, true); // Use "postId" as the key
+      } else {
+        post.upcord.set(postId, true); // Use "postId" as the key
+      }
+  
+      const updatedPost = await Inscribe.findByIdAndUpdate(
+        id,
+        { upcord: post.upcord, downcord: post.downcord },
+        { new: true }
+      );
+  
+      res.status(200).json(updatedPost);
     } catch (error) {
-        console.log(error);
-        res.status(404).json({ message: error.message });
+      console.log(error);
+      res.status(404).json({ message: error.message });
     }
-});
+  });
+  
 
 
 
 router.patch("/:id/downcord", async (req, res) => {
     try {
         const { id }  = req.params;
-        const userID  = localStorage.getItem("id");
+        const { postId }  = req.body;
         const post = await Inscribe.findById(id);
-        const isdowncorded = post.downcord.get(userID);
-        const isupcorded= post.upcord.get(userID);
+        const isdowncorded = post.downcord.get(postId);
+        const isupcorded= post.upcord.get(postId);
 
         if (isdowncorded) {
-            post.downcord.delete(userID);
+            post.downcord.delete(postId);
         }
         else if(isupcorded){
-            post.upcord.delete(userID);
-            post.downcord.set(userID, true);
+            post.upcord.delete(postId);
+            post.downcord.set(postId, true);
         }
         else {
-            post.downcord.set(userID, true);
+            post.downcord.set(postId, true);
         }
 
         const updatedPost = await Inscribe.findByIdAndUpdate(
@@ -88,11 +90,11 @@ router.patch("/:id/downcord", async (req, res) => {
 router.post("/:id/comment", async (req, res) => {
     try {
         const { id } = req.params;
-    const userID = localStorage.getItem("id");
-    const user = await User.findById(userID);
+        // const { postId }  = req.body;
+    const user = await User.findById(req.body.senderid);
 
     const newComment = {
-        senderid: user._id,
+        senderid: req.body.senderid,
         senderName: user.name,
         comment: req.body.comment
     };

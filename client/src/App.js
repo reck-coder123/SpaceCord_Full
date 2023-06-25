@@ -25,10 +25,10 @@ function App() {
 			<Route path="/password-reset/:id/:token" element={<PasswordReset />} />
 			{user && <Route path="/inscribe" exact element={<Inscribe />} />}
 			<Route path="/inscribe" exact element={<Signup />} />
-			{user && <Route path="/profile" element={<Profile />} />}
-			{user && <Route path="/updateProfile" element={<UpdateProfile />} />}
-			<Route path="/profile" exact element={<Signup />} />
-			{user && <Route path="/feeds" element={<Feeds />} />}
+			{user && <Route path="/profile/:userId" element={<Profile />} />}
+			{user && <Route path="/updateProfile/:userId" element={<UpdateProfile />} />}
+			<Route path="/profile/:userId" exact element={<Signup />} />
+			<Route path="/feeds" element={<Feeds />} />
 			<Route path="/feeds" exact element={<Signup />} />
 
 

@@ -32,10 +32,13 @@ const inscribeschema=mongoose.Schema({
         },
         senderName:{
             type: String,
+            required:true,
         },
         comment:{
             type:String,
-            trim:true
+            trim:true,
+            required:true,
+
         }
     }],
     upcord:{

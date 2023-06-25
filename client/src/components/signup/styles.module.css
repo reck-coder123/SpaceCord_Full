@@ -7,18 +7,15 @@
 }
 body{
     color: white; 
+    
 }
-.container{
-    background-image: url(../jpg/varun_rawat72_empty_deep_space_hyper_realistic_8k_1280x720_pixe_06fb12b4-7d15-47e3-b7ab-a2653d2c4154.png);
-    background-color: black;
-    background-size: cover ;
-    background-repeat: no-repeat;
-    background-position: center ;
-}
+
 .full{
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
+    height: 100%;
     background-color: rgba(0,0,0,.6);
+    
 }
 .logo img{
     margin: 5px;
@@ -26,10 +23,13 @@ body{
     height: 63px;
 }
 .login{
-    margin: -20px 168px;
-    position: relative;
-    left: -5%;
-    scale: 0.85;
+    /* scale: 0.85; */
+    scale: 0.75;
+    height: 80%;
+    /* display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between; */
 }
 .col-md-6{
     position: relative;
@@ -84,9 +84,6 @@ label{
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-  left: 23.5%;
-  top: 371px;
   transform: translate(-50%);
   width: 175px;
 }
@@ -127,4 +124,11 @@ label{
     text-decoration: none;
     color: white;
     font-size: 13px;
+}
+
+@media screen and (max-width: 1000px) {
+    .question{
+        top:90%;
+        right:18%;
+    }
 }

@@ -45,7 +45,7 @@ router.post("/", async (req, res) => {
 		localStorage.setItem("id",user._id);
 		localStorage.setItem("name",user.name);
 		// console.log(localStorage.getItem("id"));
-		res.status(200).send({ data: token, message: "logged in successfully" });
+		res.status(200).send({ data: token,id:user._id, message: "logged in successfully" });
 	} catch (error) {
 		res.status(500).send({ message: "Internal Server Error" });
 		console.log(error);
