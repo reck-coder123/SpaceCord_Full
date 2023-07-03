@@ -11,17 +11,18 @@ import Card from 'react-bootstrap/Card';
 import Accordion from 'react-bootstrap/Accordion';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
 
-
 const Profile = () => {
   const [userData, setUserData] = useState(null);
+  const [loggedinData, setLoggedinData]= useState(null);
   const { userId } = useParams();
   const [imageURL, setImageURL] = useState("");
   const [feedsData, setFeedsData] = useState([]);
-  const [error, setError] = useState("");
   const [scrolled, SetScrolled]= useState(false);
   const [isloggedin, Setisloggedin]= useState(false);
   
@@ -74,6 +75,28 @@ const Profile = () => {
     }
   };
 
+  const getLoggedUser = async () => {
+    try {
+      const url = `http://localhost:8080/api/profile/${localStorage.getItem("Id")}`;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+
+      const data = await response.json();
+      setLoggedinData(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const getUserFeeds = async () => {
     try {
       const url = `http://localhost:8080/api/profile/${userId}/posts`;
@@ -97,9 +120,12 @@ const Profile = () => {
   };
 
   useEffect(() => {
+    getLoggedUser();
     getUser();
     getUserFeeds();
   }, []);
+
+
 
   const patchLike = async (_id, postId) => {
     const response = await fetch(
@@ -139,6 +165,21 @@ const Profile = () => {
     );
   };
 
+  const patchblinks= async()=>{
+    const response= await fetch(
+      `http://localhost:8080/api/profile/${userId}/blink`,
+      {
+        method:"PATCH",
+        headers:{
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({id:localStorage.getItem("Id")}),
+      }
+    );
+    const updatedBlinks= await response.json();
+    setLoggedinData(updatedBlinks);
+  }
+
   // Assuming you have a separate state for the new comment
   const [newComment, setNewComment] = useState("");
 
@@ -167,7 +208,8 @@ const Profile = () => {
         error.response.status >= 400 &&
         error.response.status <= 500
       ) {
-        setError(error.response.data.message);
+        console.log(error.response.data.message);
+
       }
     }
   };
@@ -200,9 +242,30 @@ const Profile = () => {
       Edit
     </Button>
   )}
-    
+
+{!isloggedin && (
+  <Button
+    style={{ float: "right", margin: "10px" }}
+    variant={userData.blinks[userId] ? "success" : "primary"}
+    onClick={() => patchblinks()}
+  >
+  {loggedinData.blinks[userId]  ? (
+      <>
+        <PersonRemoveIcon />
+        {" blinked"}
+        
+      </>
+    ) : (
+      <>
+        <PersonAddIcon />
+        {" blink"}
+      </>
+    )}
+  </Button>
+)}
+  
     <div className="topInfo" style={{position:"relative",top:"-4rem", left:"4.5rem", width:"90%"}}>
-    <h3 >{userData.name}</h3>
+    <h3 >{userData.name}</h3> 
     <p style={{fontSize:"14px"}}>{userData.city}</p>
     <div style={{display:"flex",justifyContent:"space-between",gap:"10px"}}>
     <p style={{background:"rgba(0, 0, 0, 0.15)",padding:"2rem", borderRadius:"10px", width:"70%"}}>{userData.describe} Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sequi id magni repellat numquam esse explicabo delectus sed cumque eius in laudantium maiores quia aperiam, ipsa nisi autem quo pariatur cupiditate.</p>
@@ -250,16 +313,6 @@ const Profile = () => {
 </div>
     
     </div>
-    
-    {/* <h3>Name: {userData.name}</h3>
-      <h3>Email: {userData.email}</h3>
-      <h3>College: {userData.college}</h3>
-      <h3>City: {userData.city}</h3>
-      <h3>Course: {userData.course}</h3>
-      <img src={imageURL} alt="Profile" />
-      {feedsData.map((feed) => (
-        <h3 key={feed._id}>Post: {feed.title}</h3>
-      ))} */}
     </div>
 
     <div className="myposts">
@@ -311,13 +364,6 @@ const Profile = () => {
             />
           </div>
           <div className="col-12">
-            {/* <button
-              type="submit"
-              className="btn btn-dark"
-              onClick={(event) => post_comment(feed._id, event)}
-            >
-              Post
-            </button> */}
             <Button type="submit" style={{margin:"10px 0 10px 0"}} onClick={(event) => post_comment(feed._id, event)} variant="success">Post</Button>
           </div>
           <div className="viewcomment">

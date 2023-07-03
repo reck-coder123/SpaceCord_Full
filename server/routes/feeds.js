@@ -29,16 +29,16 @@ router.get('/image/:filename', (req, res) => {
       const { postId } = req.body; // Use "postId" instead of "postId"
   
       const post = await Inscribe.findById(id);
-      const isupcorded = post.upcord.get(postId); // Use "postId" as the key
-      const isdowncorded = post.downcord.get(postId); // Use "postId" as the key
+      const isupcorded = post.upcord.get(postId); 
+      const isdowncorded = post.downcord.get(postId); 
   
       if (isupcorded) {
-        post.upcord.delete(postId); // Use "postId" as the key
+        post.upcord.delete(postId); 
       } else if (isdowncorded) {
-        post.downcord.delete(postId); // Use "postId" as the key
-        post.upcord.set(postId, true); // Use "postId" as the key
+        post.downcord.delete(postId); 
+        post.upcord.set(postId, true); 
       } else {
-        post.upcord.set(postId, true); // Use "postId" as the key
+        post.upcord.set(postId, true); 
       }
   
       const updatedPost = await Inscribe.findByIdAndUpdate(

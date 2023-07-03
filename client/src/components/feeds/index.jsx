@@ -192,7 +192,7 @@ const post_comment = async (_id, event) => {
     // Check if the new comment is empty
     if (newComment.trim() === "") {
       setShow(true);
-      setError("comment can't be empty!!");
+      setError("Comment can't be empty!!");
       return; // Stop execution if comment is empty
     }
 
@@ -209,12 +209,24 @@ const post_comment = async (_id, event) => {
 
     setLoading(false);
     setNewComment("");
-    // window.location = "/feeds";
+
+    const freshComment = res.data; // Assuming the response contains the updated comment data
+
+    // Update feedsData with the freshComment at the given _id
+    const updatedFeedsData = feedsData.map((post) => {
+      if (post._id === _id) {
+        return {
+          ...post,
+          freshComment,
+        };
+      }
+      return post;
+    });
+
+    setFeedsData(updatedFeedsData);
+
     const msg = res.message;
     console.log(msg);
-    // $("#comment-section").load(window.location.href + " #comment-section", function () {
-    //   setLoading(false); // Set loading state to false once the comment section has finished loading
-    // });
 
   } catch (error) {
     if (

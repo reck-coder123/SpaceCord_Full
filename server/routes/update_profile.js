@@ -1,14 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { User } = require("../models/users");
-const LocalStorage = require('node-localstorage').LocalStorage;
-const localStorage = new LocalStorage('./scratch');
+const {Inscribe}= require("../models/inscribe");
 
 router.post('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, password, confirmpassword, email, mobile, city, college, startyear, completeyear, course, branch, bio, domains, describe, experience, skills } = req.body;
-
+    const {  name, password, confirmpassword, email, mobile, city, college, startyear, completeyear, course, branch, bio, domains, describe, experience, skills } = req.body;
     const user = await User.findOneAndUpdate(
       { _id: id },
       { name, password, confirmpassword, email, mobile, city, college, startyear, completeyear, course, branch, bio, domains, describe, experience, skills },
@@ -27,8 +25,18 @@ router.post('/:id', async (req, res) => {
       return res.redirect(`${process.env.CLIENT_URL}signup`);
     }
 
+    const newpostdetails = await Inscribe.updateMany(
+      { postId: id },
+      { UserName: name, UserImage: user.image }
+    );
+    
+    const updatedPosts = await Inscribe.find({ postId: id });
+    
+
+   
+
     console.log("profile updated");
-    res.status(200).json({ user, msg: "Profile updated" });
+    res.status(200).json({ user,updatedPosts, msg: "Profile updated" });
 
   } catch (error) {
     console.log(error);
