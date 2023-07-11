@@ -92,6 +92,7 @@ const Profile = () => {
 
       const data = await response.json();
       setLoggedinData(data);
+      
     } catch (error) {
       console.error(error);
     }
@@ -242,13 +243,15 @@ const Profile = () => {
       Edit
     </Button>
   )}
-
+  {/* {console.log(loggedinData)}
+  {console.log(userData)} */}
 {!isloggedin && (
   <Button
     style={{ float: "right", margin: "10px" }}
-    variant={userData.blinks[userId] ? "success" : "primary"}
+    variant="primary"
     onClick={() => patchblinks()}
   >
+    
   {loggedinData.blinks[userId]  ? (
       <>
         <PersonRemoveIcon />

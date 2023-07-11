@@ -22,10 +22,8 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
 
-
-
-
 const Feeds = () => {
+
   const [feedsData, setFeedsData] = useState([]);
   const [userData,setUserData]=useState([]);
   const [error, setError] = useState("");
@@ -273,7 +271,7 @@ const post_comment = async (_id, event) => {
 
 
 
-      <Navbar style={{position:"sticky" ,top:"0"}} className={scrolled ? styles.scrolled: ""} expand="lg" data-bs-theme="dark">
+      <Navbar style={{position:"sticky" ,top:"0"}} className={scrolled ? styles.scrolled: ""} id="navbar" expand="lg" data-bs-theme="dark">
       <Container fluid>
         <Navbar.Brand href="/"><img src={logo} alt="logo" style={{width:"42px",height:"42px"}} />feeds</Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
@@ -294,7 +292,7 @@ const post_comment = async (_id, event) => {
       placeholder="what's on your mind today?.."
       onChange={(e) => setSearchInput(e.target.value)}
       value={searchInput}
-      className="me-2"
+      className="me-2 search"
       aria-label="Search"
     />
   </Form>
@@ -383,13 +381,6 @@ const post_comment = async (_id, event) => {
                   />
                 </div>
                 <div className="col-12">
-                  {/* <button
-                    type="submit"
-                    className="btn btn-dark"
-                    onClick={(event) => post_comment(feed._id, event)}
-                  >
-                    Post
-                  </button> */}
                   <Button type="submit" style={{ margin: "10px 0 10px 0" }} onClick={(event) => post_comment(feed._id, event)} variant="contained" color="success" disabled={loading}>
                   {loading ? (
                 <Spinner
@@ -423,9 +414,8 @@ const post_comment = async (_id, event) => {
 ) : (
     <div className="loading">Loading...</div>
 )}
-
-
     </div>
+    
   );
 };
 
