@@ -243,8 +243,8 @@ const Profile = () => {
       Edit
     </Button>
   )}
-  {/* {console.log(loggedinData)}
-  {console.log(userData)} */}
+  {console.log(loggedinData)}
+  {console.log(userData)}
 {!isloggedin && (
   <Button
     style={{ float: "right", margin: "10px" }}

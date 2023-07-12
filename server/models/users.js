@@ -72,6 +72,7 @@ const schema= mongoose.Schema({
     blinks:{
         type: Map,
       of: Boolean,
+      default:{},
     },
     image:{
         data:Buffer,
