@@ -53,7 +53,9 @@ Now start client in a new terminal
 
 
 - Feeds
-https://drive.google.com/file/d/1-pLdLI8nx74x54TsETJbpTe883f5Wdi4/view?usp=sharing
+  
+![Screenshot 2024-02-04 223846](https://github.com/reck-coder123/SpaceCord_Full/assets/105230070/0de0389e-67c9-422b-ac30-ef20e2ae702a)
 
 - Login Page
-https://drive.google.com/file/d/1cQbVEviSfwtUfaQ1prsydQF8tHvqLbr9/view?usp=sharing
+  
+![Screenshot 2024-02-04 224013](https://github.com/reck-coder123/SpaceCord_Full/assets/105230070/8ce3f08c-1e24-47e7-a280-b7c6d9737699)
