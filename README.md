@@ -49,7 +49,8 @@ Now start client in a new terminal
 
 - Landing Page
 
-https://drive.google.com/file/d/1_8BnM12-velVaQCoBP4G62kx7uzcrBYQ/view?usp=sharing
+![Screenshot 2024-02-04 223736](https://github.com/reck-coder123/SpaceCord_Full/assets/105230070/46ff5268-9e5f-4801-842d-3f7d9f49fe12)
+
 
 - Feeds
 https://drive.google.com/file/d/1-pLdLI8nx74x54TsETJbpTe883f5Wdi4/view?usp=sharing
